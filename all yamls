@@ -1,0 +1,397 @@
+[osuser@bastion ~]$ cd epay_deven/
+[osuser@bastion epay_deven]$ ll
+total 32
+-rw-r----- 1 osuser osuser  148 Sep 29 13:16 dev-admin-permissive.yaml
+-rw-r----- 1 osuser osuser  385 Sep 29 09:55 network-policy.yaml
+-rw-r----- 1 osuser osuser 3183 Sep 29 06:49 recon-spark-app.yaml
+-rw-r----- 1 osuser osuser  745 Sep 22 12:14 scc.yaml
+-rw-r----- 1 osuser osuser  267 Sep 25 10:21 serviceentry.yaml
+drwxr-x--- 3 osuser osuser   45 Sep 13 15:10 spark
+-rw-r----- 1 osuser osuser 4712 Sep 22 12:20 spark-service-account.yaml
+-rw-r----- 1 osuser osuser 1142 Sep 22 12:15 sparnp.yaml
+[osuser@bastion epay_deven]$ cat dev-admin-permissive.yaml
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: dev-admin
+spec:
+  mtls:
+    mode: PERMISSIVE
+
+[osuser@bastion epay_deven]$ cat network-policy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-spark-driver
+spec:
+  podSelector:
+    matchLabels:
+      spark-role: driver
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: admin-adminservice
+  egress:
+  - {}
+  - to:
+    - podSelector:
+        matchLabels:
+          app: admin-adminservice
+[osuser@bastion epay_deven]$ cat recon-spark-app.yaml
+# SparkApplication for ReconSparkAppMain
+# This YAML demonstrates how to deploy the recon Spark application
+
+apiVersion: spark.apache.org/v1beta1
+kind: SparkApplication
+metadata:
+  name: recon-spark-app
+  namespace: dev-rns
+  labels:
+    app: recon-spark-main
+    version: "0.0.1"
+    java-version: "21"
+    component: recon
+spec:
+  deploymentMode: ClusterMode
+  mainClass: com.epay.operations.recon.ReconSparkAppMain
+  # JAR path in the custom image
+  jars: local:///opt/spark/work-dir/recon-spark-job.jar
+
+  runtimeVersions:
+    sparkVersion: "4.0.0"
+
+  sparkConf:
+    # === CONTAINER CONFIGURATION ===
+    # Use custom recon image (build from Dockerfile)
+    spark.kubernetes.container.image: registry.dev.sbiepay.sbi:8443/spark/sparkrecon:4.0.0_12092025v20
+    spark.kubernetes.container.image.pullPolicy: Always
+
+    # === SECURITY CONFIGURATION ===
+    spark.kubernetes.authenticate.driver.serviceAccountName: spark-sa
+    spark.kubernetes.executor.serviceAccount: spark-sa
+
+    # === RESOURCE CONFIGURATION ===
+    spark.driver.memory: "2g"
+    spark.driver.cores: "2"
+    spark.executor.instances: "1"
+    spark.executor.memory: "1g"
+    spark.executor.cores: "1"
+    spark.dynamicAllocation.enabled: "false"
+
+    # === RECON APPLICATION CONFIGURATION ===
+    # Environment variables for recon processing
+    spark.kubernetes.driver.service.type: ClusterIP
+    spark.kubernetes.driver.env.rfId: "1A6CF13C-DF22-4845-A15A-F740E2716015"
+    spark.kubernetes.driver.env.callbackUrl: "http://your-ops-service:9097/api/rns/v1/spark/recon-complete-callback"
+    spark.kubernetes.driver.env.RECON_MODE: "production"
+    spark.kubernetes.driver.env.DATA_SOURCE: "hdfs"
+    spark.kubernetes.driver.env.OUTPUT_PATH: "/tmp/recon/output"
+    spark.kubernetes.driver.env.LOG_LEVEL: "INFO"
+
+    # === SYSTEM PROPERTIES FOR RECON ===
+    spark.driver.extraJavaOptions: >-
+      -DrfId=1A6CF13C-DF22-4845-A15A-F740E2716015
+      -DcallbackUrl=http://your-ops-service:9097/api/rns/v1/spark/recon-complete-callback
+      -DRECON_MODE=production
+      -DDATA_SOURCE=hdfs
+      -DOUTPUT_PATH=/tmp/recon/output
+      -DLOG_LEVEL=INFO
+      -XX:+UseG1GC
+      -XX:MaxGCPauseMillis=200
+
+    # === EXECUTOR JAVA OPTIONS ===
+    spark.executor.extraJavaOptions: >-
+      -XX:+UseG1GC
+      -XX:MaxGCPauseMillis=200
+
+    # === HADOOP CONFIGURATION ===
+    spark.hadoop.security.authentication: "simple"
+    spark.kubernetes.kerberos.enabled: "false"
+
+    # === APPLICATION CONFIGURATION ===
+    spark.kubernetes.namespace: dev-rns
+    spark.app.name: "recon-spark-app"
+
+    # === LOGGING CONFIGURATION ===
+    spark.kubernetes.driver.log.maxFiles: "10"
+    spark.kubernetes.driver.log.maxSize: "200m"
+    spark.kubernetes.executor.log.maxFiles: "10"
+    spark.kubernetes.executor.log.maxSize: "200m"
+
+    # === RECON SPECIFIC CONFIGURATION ===
+    # Configure Spark for data processing workloads
+    spark.sql.adaptive.enabled: "true"
+    spark.sql.adaptive.coalescePartitions.enabled: "true"
+    spark.sql.adaptive.skewJoin.enabled: "true"
+    spark.serializer: "org.apache.spark.serializer.KryoSerializer"
+    spark.sql.execution.arrow.pyspark.enabled: "true"
+[osuser@bastion epay_deven]$ cat scc.yaml
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: spark-scc
+  annotations:
+    description: "Security Context Constraints for Apache Spark applications"
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowPrivilegeEscalation: true
+allowPrivilegedContainer: false
+allowedCapabilities: []
+defaultAddCapabilities: []
+fsGroup:
+  type: RunAsAny
+priority: 10
+readOnlyRootFilesystem: false
+requiredDropCapabilities: []
+runAsUser:
+  type: RunAsAny
+seLinuxContext:
+  type: RunAsAny
+seccompProfiles:
+- DockerDefault
+supplementalGroups:
+  type: RunAsAny
+volumes:
+- configMap
+- downwardAPI
+- emptyDir
+- persistentVolumeClaim
+- projected
+- secret
+
+[osuser@bastion epay_deven]$ cat serviceentry.yaml
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: admin-service-entry
+spec:
+  hosts:
+  - admin-adminservice.dev-admin.svc.cluster.local
+  location: MESH_INTERNAL
+  ports:
+  - number: 9094
+    name: http
+    protocol: HTTP
+  resolution: DNS
+[osuser@bastion epay_deven]$ cat spark-service-account.yaml
+# Unified Service Account and RBAC Configuration
+# Compatible with Apache Spark K8s Operator v0.4.0
+# Works for both Kubernetes and OpenShift
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: spark-sa
+  namespace: dev-rns
+  labels:
+    app: spark-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: spark-role
+  namespace: dev-rns
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "services/finalizers", "configmaps", "secrets", "persistentvolumeclaims", "events"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["pods/exec", "pods/log"]
+  verbs: ["create", "get"]
+- apiGroups: [""]
+  resources: ["pods/finalizers"]
+  verbs: ["update", "patch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "statefulsets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["spark.apache.org"]
+  resources: ["sparkapplications", "sparkapplications/status"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["spark.apache.org"]
+  resources: ["sparkapplications/finalizers"]
+  verbs: ["update", "patch"]
+- apiGroups: ["spark.apache.org"]
+  resources: ["scheduledsparkapplications", "scheduledsparkapplications/status"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["spark.apache.org"]
+  resources: ["scheduledsparkapplications/finalizers"]
+  verbs: ["update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: spark-role-binding
+  namespace: dev-rns
+subjects:
+- kind: ServiceAccount
+  name: spark-sa
+  namespace: dev-rns
+roleRef:
+  kind: Role
+  name: spark-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# Additional ClusterRole for cross-namespace operations
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: spark-cluster-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets", "events"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["spark.apache.org"]
+  resources: ["sparkapplications", "sparkapplications/status"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["spark.apache.org"]
+  resources: ["sparkapplications/finalizers"]
+  verbs: ["update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: spark-cluster-role-binding
+subjects:
+- kind: ServiceAccount
+  name: spark-sa
+  namespace: dev-rns
+roleRef:
+  kind: ClusterRole
+  name: spark-cluster-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# CRITICAL: Spark Operator RBAC for cross-namespace operations
+# This gives the Spark Operator permissions to manage resources in dev-spark namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: spark-operator-dev-spark-role
+  namespace: dev-rns
+rules:
+# Full permissions for Spark Operator in dev-spark namespace
+- apiGroups: [""]
+  resources: ["pods", "services", "services/finalizers", "configmaps", "secrets", "events", "persistentvolumeclaims"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["pods/exec", "pods/log"]
+  verbs: ["create", "get"]
+- apiGroups: [""]
+  resources: ["pods/finalizers"]
+  verbs: ["update", "patch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "statefulsets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["spark.apache.org"]
+  resources: ["sparkapplications", "sparkapplications/status"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["spark.apache.org"]
+  resources: ["sparkapplications/finalizers"]
+  verbs: ["update", "patch"]
+- apiGroups: ["batch"]
+  resources: ["jobs"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: spark-operator-dev-spark-role-binding
+  namespace: dev-rns
+subjects:
+# Bind Spark Operator service account to dev-spark namespace role
+- kind: ServiceAccount
+  name: spark-kubernetes-operator
+  namespace: dev-spark-operator
+roleRef:
+  kind: Role
+  name: spark-operator-dev-spark-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# OpenShift-specific: Add SCC to service account
+# This section is only needed for OpenShift deployments
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: spark-scc-binding
+  annotations:
+    platform: "openshift"
+subjects:
+- kind: ServiceAccount
+  name: spark-sa
+  namespace: dev-rns
+roleRef:
+  kind: ClusterRole
+  name: system:openshift:scc:spark-scc
+  apiGroup: rbac.authorization.k8s.io
+
+[osuser@bastion epay_deven]$ cat sparnp.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: spark-network-policy
+  namespace: dev-rns
+  annotations:
+    description: "Network Policy for Apache Spark applications"
+spec:
+  podSelector:
+    matchLabels:
+      app: spark
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: spark
+    ports:
+    - protocol: TCP
+      port: 7077
+    - protocol: TCP
+      port: 4040
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 8081
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: spark
+    ports:
+    - protocol: TCP
+      port: 7077
+    - protocol: TCP
+      port: 4040
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 8081
+    - protocol: TCP
+      port: 1590
+  # Allow DNS resolution
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  # Allow Kubernetes API access
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 6443
+
+[osuser@bastion epay_deven]$
