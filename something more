@@ -142,3 +142,25 @@ spark-kubernetes-operator-7d975469d9-ppflp   1/1     Running   0          2d21h
 [osuser@bastion ~]$
 
 [osuser@bastion ~]$
+
+
+
+
+
+
+
+
+
+
+Let’s Confirm What’s Missing
+
+Please run these commands:
+
+# 1. Check if there's any deployment or statefulset for history server
+oc get deploy,statefulset -n dev-spark-operator | grep -i history
+
+# 2. Check if Helm chart still defines it
+helm get values spark-operator -n dev-spark-operator | grep -A5 history
+
+# 3. Check if there’s a leftover configmap or PVC
+oc get configmap,pvc -n dev-spark-operator | grep -i history
