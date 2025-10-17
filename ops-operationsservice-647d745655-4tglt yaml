@@ -1,0 +1,511 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  generateName: ops-operationsservice-647d745655-
+  annotations:
+    openshift.io/scc: anyuid
+    kubectl.kubernetes.io/restartedAt: '2025-09-20T11:57:27Z'
+    sidecar.istio.io/interceptionMode: REDIRECT
+    prometheus.io/port: '15020'
+    k8s.ovn.org/pod-networks: '{"default":{"ip_addresses":["172.16.8.78/23"],"mac_address":"0a:58:ac:10:08:4e","gateway_ips":["172.16.8.1"],"routes":[{"dest":"172.16.0.0/16","nextHop":"172.16.8.1"},{"dest":"172.30.0.0/16","nextHop":"172.16.8.1"},{"dest":"100.64.0.0/16","nextHop":"172.16.8.1"}],"ip_address":"172.16.8.78/23","gateway_ip":"172.16.8.1"}}'
+    k8s.v1.cni.cncf.io/networks: v2-6-istio-cni
+    prometheus.io/path: /stats/prometheus
+    traffic.sidecar.istio.io/excludeInboundPorts: '15090,15021'
+    sidecar.istio.io/status: '{"initContainers":null,"containers":["istio-proxy"],"volumes":["workload-socket","credential-socket","workload-certs","istio-envoy","istio-data","istio-podinfo","istiod-ca-cert"],"imagePullSecrets":null,"revision":"dev-basic"}'
+    traffic.sidecar.istio.io/includeOutboundIPRanges: '*'
+    kubectl.kubernetes.io/default-logs-container: operationsservice
+    kubectl.kubernetes.io/default-container: operationsservice
+    k8s.v1.cni.cncf.io/network-status: |-
+      [{
+          "name": "ovn-kubernetes",
+          "interface": "eth0",
+          "ips": [
+              "172.16.8.78"
+          ],
+          "mac": "0a:58:ac:10:08:4e",
+          "default": true,
+          "dns": {}
+      },{
+          "name": "dev-spark/v2-6-istio-cni",
+          "dns": {}
+      }]
+    istio.io/rev: dev-basic
+    traffic.sidecar.istio.io/includeInboundPorts: '*'
+    prometheus.io/scrape: 'true'
+  resourceVersion: '456097345'
+  name: ops-operationsservice-647d745655-4tglt
+  uid: 8453d0e1-8bb8-4068-a3a7-95a541e21fba
+  creationTimestamp: '2025-10-09T14:32:03Z'
+  managedFields:
+    - manager: kube-controller-manager
+      operation: Update
+      apiVersion: v1
+      time: '2025-10-09T14:32:03Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            .: {}
+            'f:kubectl.kubernetes.io/restartedAt': {}
+          'f:generateName': {}
+          'f:labels':
+            .: {}
+            'f:app.kubernetes.io/instance': {}
+            'f:app.kubernetes.io/managed-by': {}
+            'f:app.kubernetes.io/name': {}
+            'f:app.kubernetes.io/version': {}
+            'f:helm.sh/chart': {}
+            'f:pod-template-hash': {}
+            'f:sidecar.istio.io/inject': {}
+          'f:ownerReferences':
+            .: {}
+            'k:{"uid":"33944cf3-d028-4e0e-8c73-fddcdbc26d8d"}': {}
+        'f:spec':
+          'f:volumes':
+            .: {}
+            'k:{"name":"config"}':
+              .: {}
+              'f:configMap':
+                .: {}
+                'f:defaultMode': {}
+                'f:name': {}
+              'f:name': {}
+          'f:containers':
+            'k:{"name":"operationsservice"}':
+              'f:image': {}
+              'f:volumeMounts':
+                .: {}
+                'k:{"mountPath":"/opt/gradle"}':
+                  .: {}
+                  'f:mountPath': {}
+                  'f:name': {}
+              'f:terminationMessagePolicy': {}
+              .: {}
+              'f:resources': {}
+              'f:env':
+                .: {}
+                'k:{"name":"SPRING_CONFIG_LOCATION"}':
+                  .: {}
+                  'f:name': {}
+                  'f:value': {}
+              'f:securityContext': {}
+              'f:terminationMessagePath': {}
+              'f:imagePullPolicy': {}
+              'f:ports':
+                .: {}
+                'k:{"containerPort":9097,"protocol":"TCP"}':
+                  .: {}
+                  'f:containerPort': {}
+                  'f:name': {}
+                  'f:protocol': {}
+              'f:name': {}
+          'f:dnsPolicy': {}
+          'f:serviceAccount': {}
+          'f:restartPolicy': {}
+          'f:schedulerName': {}
+          'f:terminationGracePeriodSeconds': {}
+          'f:serviceAccountName': {}
+          'f:enableServiceLinks': {}
+          'f:securityContext': {}
+    - manager: worker1.dev.sbiepay.sbi
+      operation: Update
+      apiVersion: v1
+      time: '2025-10-09T14:32:04Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            'f:k8s.ovn.org/pod-networks': {}
+      subresource: status
+    - manager: multus-daemon
+      operation: Update
+      apiVersion: v1
+      time: '2025-10-09T14:32:06Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            'f:k8s.v1.cni.cncf.io/network-status': {}
+      subresource: status
+    - manager: kubelet
+      operation: Update
+      apiVersion: v1
+      time: '2025-10-09T14:32:09Z'
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          'f:conditions':
+            'k:{"type":"ContainersReady"}':
+              .: {}
+              'f:lastProbeTime': {}
+              'f:lastTransitionTime': {}
+              'f:status': {}
+              'f:type': {}
+            'k:{"type":"Initialized"}':
+              .: {}
+              'f:lastProbeTime': {}
+              'f:lastTransitionTime': {}
+              'f:status': {}
+              'f:type': {}
+            'k:{"type":"PodReadyToStartContainers"}':
+              .: {}
+              'f:lastProbeTime': {}
+              'f:lastTransitionTime': {}
+              'f:status': {}
+              'f:type': {}
+            'k:{"type":"Ready"}':
+              .: {}
+              'f:lastProbeTime': {}
+              'f:lastTransitionTime': {}
+              'f:status': {}
+              'f:type': {}
+          'f:containerStatuses': {}
+          'f:hostIP': {}
+          'f:hostIPs': {}
+          'f:phase': {}
+          'f:podIP': {}
+          'f:podIPs':
+            .: {}
+            'k:{"ip":"172.16.8.78"}':
+              .: {}
+              'f:ip': {}
+          'f:startTime': {}
+      subresource: status
+  namespace: dev-spark
+  ownerReferences:
+    - apiVersion: apps/v1
+      kind: ReplicaSet
+      name: ops-operationsservice-647d745655
+      uid: 33944cf3-d028-4e0e-8c73-fddcdbc26d8d
+      controller: true
+      blockOwnerDeletion: true
+  labels:
+    security.istio.io/tlsMode: istio
+    app.kubernetes.io/instance: ops
+    service.istio.io/canonical-revision: 1.16.0
+    app.kubernetes.io/version: 1.16.0
+    sidecar.istio.io/inject: 'true'
+    maistra-version: 2.6.6
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: operationsservice-0.1.0
+    service.istio.io/canonical-name: operationsservice
+    app.kubernetes.io/name: operationsservice
+    pod-template-hash: 647d745655
+spec:
+  nodeSelector:
+    env: dev
+  restartPolicy: Always
+  serviceAccountName: spark-sa
+  imagePullSecrets:
+    - name: spark-sa-dockercfg-62msc
+  priority: 0
+  schedulerName: default-scheduler
+  enableServiceLinks: true
+  terminationGracePeriodSeconds: 30
+  preemptionPolicy: PreemptLowerPriority
+  nodeName: worker1.dev.sbiepay.sbi
+  securityContext:
+    seLinuxOptions:
+      level: 's0:c39,c34'
+  containers:
+    - resources: {}
+      terminationMessagePath: /dev/termination-log
+      name: operationsservice
+      env:
+        - name: SPRING_CONFIG_LOCATION
+          value: 'file:/opt/gradle/'
+      securityContext:
+        capabilities:
+          drop:
+            - MKNOD
+      ports:
+        - name: http
+          containerPort: 9097
+          protocol: TCP
+      imagePullPolicy: IfNotPresent
+      volumeMounts:
+        - name: config
+          mountPath: /opt/gradle
+        - name: kube-api-access-knvth
+          readOnly: true
+          mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      terminationMessagePolicy: File
+      image: 'registry.dev.sbiepay.sbi:8443/library/operationsservice:v-develop-20250920072749'
+    - resources:
+        limits:
+          cpu: '2'
+          memory: 1Gi
+        requests:
+          cpu: 10m
+          memory: 128Mi
+      readinessProbe:
+        httpGet:
+          path: /healthz/ready
+          port: 15021
+          scheme: HTTP
+        initialDelaySeconds: 1
+        timeoutSeconds: 3
+        periodSeconds: 2
+        successThreshold: 1
+        failureThreshold: 30
+      terminationMessagePath: /dev/termination-log
+      name: istio-proxy
+      env:
+        - name: JWT_POLICY
+          value: first-party-jwt
+        - name: PILOT_CERT_PROVIDER
+          value: istiod
+        - name: CA_ADDR
+          value: 'istiod-dev-basic.dev-istio-system.svc:15012'
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: INSTANCE_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: SERVICE_ACCOUNT
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.serviceAccountName
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.hostIP
+        - name: ISTIO_CPU_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              resource: limits.cpu
+              divisor: '0'
+        - name: PROXY_CONFIG
+          value: |
+            {"discoveryAddress":"istiod-dev-basic.dev-istio-system.svc:15012","tracing":{"zipkin":{"address":"jaeger-collector.dev-istio-system.svc:9411"}},"proxyMetadata":{"ISTIO_META_DNS_AUTO_ALLOCATE":"true","ISTIO_META_DNS_CAPTURE":"true","PROXY_XDS_VIA_AGENT":"true"}}
+        - name: ISTIO_META_POD_PORTS
+          value: |-
+            [
+                {"name":"http","containerPort":9097,"protocol":"TCP"}
+            ]
+        - name: ISTIO_META_APP_CONTAINERS
+          value: operationsservice
+        - name: GOMEMLIMIT
+          valueFrom:
+            resourceFieldRef:
+              resource: limits.memory
+              divisor: '0'
+        - name: GOMAXPROCS
+          valueFrom:
+            resourceFieldRef:
+              resource: limits.cpu
+              divisor: '0'
+        - name: ISTIO_META_CLUSTER_ID
+          value: Kubernetes
+        - name: ISTIO_META_NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: ISTIO_META_INTERCEPTION_MODE
+          value: REDIRECT
+        - name: ISTIO_META_WORKLOAD_NAME
+          value: ops-operationsservice
+        - name: ISTIO_META_OWNER
+          value: 'kubernetes://apis/apps/v1/namespaces/dev-spark/deployments/ops-operationsservice'
+        - name: ISTIO_META_MESH_ID
+          value: cluster.local
+        - name: TRUST_DOMAIN
+          value: cluster.local
+        - name: ISTIO_META_DNS_AUTO_ALLOCATE
+          value: 'true'
+        - name: ISTIO_META_DNS_CAPTURE
+          value: 'true'
+        - name: PROXY_XDS_VIA_AGENT
+          value: 'true'
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+            - KILL
+            - MKNOD
+            - SETGID
+            - SETUID
+        privileged: false
+        runAsUser: 1337
+        runAsGroup: 1337
+        runAsNonRoot: true
+        readOnlyRootFilesystem: true
+        allowPrivilegeEscalation: false
+      ports:
+        - name: http-envoy-prom
+          containerPort: 15090
+          protocol: TCP
+      imagePullPolicy: IfNotPresent
+      startupProbe:
+        httpGet:
+          path: /healthz/ready
+          port: 15021
+          scheme: HTTP
+        timeoutSeconds: 3
+        periodSeconds: 1
+        successThreshold: 1
+        failureThreshold: 600
+      volumeMounts:
+        - name: workload-socket
+          mountPath: /var/run/secrets/workload-spiffe-uds
+        - name: credential-socket
+          mountPath: /var/run/secrets/credential-uds
+        - name: workload-certs
+          mountPath: /var/run/secrets/workload-spiffe-credentials
+        - name: istiod-ca-cert
+          mountPath: /var/run/secrets/istio
+        - name: istio-data
+          mountPath: /var/lib/istio/data
+        - name: istio-envoy
+          mountPath: /etc/istio/proxy
+        - name: istio-podinfo
+          mountPath: /etc/istio/pod
+        - name: kube-api-access-knvth
+          readOnly: true
+          mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      terminationMessagePolicy: File
+      image: 'registry.redhat.io/openshift-service-mesh/proxyv2-rhel9@sha256:7121feee90499468cc9db9d12c8a2655a761d5f667950a00ca1febe406cd3524'
+      args:
+        - proxy
+        - sidecar
+        - '--domain'
+        - $(POD_NAMESPACE).svc.cluster.local
+        - '--proxyLogLevel=warning'
+        - '--proxyComponentLogLevel=misc:error'
+        - '--log_output_level=default:warn'
+  serviceAccount: spark-sa
+  volumes:
+    - name: workload-socket
+      emptyDir: {}
+    - name: credential-socket
+      emptyDir: {}
+    - name: workload-certs
+      emptyDir: {}
+    - name: istio-envoy
+      emptyDir:
+        medium: Memory
+    - name: istio-data
+      emptyDir: {}
+    - name: istio-podinfo
+      downwardAPI:
+        items:
+          - path: labels
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.labels
+          - path: annotations
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations
+        defaultMode: 420
+    - name: istiod-ca-cert
+      configMap:
+        name: istio-ca-root-cert
+        defaultMode: 420
+    - name: config
+      configMap:
+        name: ops-config
+        defaultMode: 420
+    - name: kube-api-access-knvth
+      projected:
+        sources:
+          - serviceAccountToken:
+              expirationSeconds: 3607
+              path: token
+          - configMap:
+              name: kube-root-ca.crt
+              items:
+                - key: ca.crt
+                  path: ca.crt
+          - downwardAPI:
+              items:
+                - path: namespace
+                  fieldRef:
+                    apiVersion: v1
+                    fieldPath: metadata.namespace
+          - configMap:
+              name: openshift-service-ca.crt
+              items:
+                - key: service-ca.crt
+                  path: service-ca.crt
+        defaultMode: 420
+  dnsPolicy: ClusterFirst
+  tolerations:
+    - key: node.kubernetes.io/not-ready
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 300
+    - key: node.kubernetes.io/unreachable
+      operator: Exists
+      effect: NoExecute
+      tolerationSeconds: 300
+    - key: node.kubernetes.io/memory-pressure
+      operator: Exists
+      effect: NoSchedule
+status:
+  containerStatuses:
+    - restartCount: 0
+      started: true
+      ready: true
+      name: istio-proxy
+      state:
+        running:
+          startedAt: '2025-10-09T14:32:07Z'
+      imageID: 'registry.redhat.io/openshift-service-mesh/proxyv2-rhel9@sha256:4adca8d6ca4bba2bcb1319748e7c5530059473d770cbadb6efeab747f0b444fa'
+      image: 'registry.redhat.io/openshift-service-mesh/proxyv2-rhel9@sha256:7121feee90499468cc9db9d12c8a2655a761d5f667950a00ca1febe406cd3524'
+      lastState: {}
+      containerID: 'cri-o://8f8b02a74bcbb64277f4edc6298cb5bd4a9930b837c24c9f22bcbfb4febe0056'
+    - restartCount: 0
+      started: true
+      ready: true
+      name: operationsservice
+      state:
+        running:
+          startedAt: '2025-10-09T14:32:06Z'
+      imageID: 'registry.dev.sbiepay.sbi:8443/library/operationsservice@sha256:b4681ba12e321ed77a6b49f5addf132b304c44e12d8e7c7dfd01819cdcf0c2ba'
+      image: 'registry.dev.sbiepay.sbi:8443/library/operationsservice:v-develop-20250920072749'
+      lastState: {}
+      containerID: 'cri-o://457196f70053c6ca2b0658cb574c8856c45c7c115d22f4e3e0cb07c20ecd7592'
+  qosClass: Burstable
+  hostIPs:
+    - ip: 10.177.142.141
+  podIPs:
+    - ip: 172.16.8.78
+  podIP: 172.16.8.78
+  hostIP: 10.177.142.141
+  startTime: '2025-10-09T14:32:04Z'
+  conditions:
+    - type: PodReadyToStartContainers
+      status: 'True'
+      lastProbeTime: null
+      lastTransitionTime: '2025-10-09T14:32:07Z'
+    - type: Initialized
+      status: 'True'
+      lastProbeTime: null
+      lastTransitionTime: '2025-10-09T14:32:04Z'
+    - type: Ready
+      status: 'True'
+      lastProbeTime: null
+      lastTransitionTime: '2025-10-09T14:32:09Z'
+    - type: ContainersReady
+      status: 'True'
+      lastProbeTime: null
+      lastTransitionTime: '2025-10-09T14:32:09Z'
+    - type: PodScheduled
+      status: 'True'
+      lastProbeTime: null
+      lastTransitionTime: '2025-10-09T14:32:03Z'
+  phase: Running
