@@ -164,3 +164,20 @@ helm get values spark-operator -n dev-spark-operator | grep -A5 history
 
 # 3. Check if there’s a leftover configmap or PVC
 oc get configmap,pvc -n dev-spark-operator | grep -i history
+
+
+
+
+
+
+
+[osuser@bastion ~]$ oc get pods -n dev-spark-operator | grep history
+[osuser@bastion ~]$ oc get pods -n dev-spark-operator
+NAME                                         READY   STATUS    RESTARTS   AGE
+spark-kubernetes-operator-7d975469d9-ppflp   1/1     Running   0          2d21h
+[osuser@bastion ~]$ oc get deploy,statefulset -n dev-spark-operator | grep -i history
+[osuser@bastion ~]$ helm get values spark-operator -n dev-spark-operator | grep -A5 history
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /home/osuser/.kube/config
+[osuser@bastion ~]$ oc get configmap,pvc -n dev-spark-operator | grep -i history
+persistentvolumeclaim/spark-history-logs-pvc   Bound    pvc-55cf1d3d-d423-4f6b-93c0-f610a1a769d5   100Gi      RWO            thin-csi-retain   <unset>                 83d
+[osuser@bastion ~]$
