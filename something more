@@ -1,0 +1,104 @@
+[osuser@bastion ~]$ oc get crd | grep spark
+sparkapplications.spark.apache.org                                2025-07-23T14:05:16Z
+sparkclusters.spark.apache.org                                    2025-07-23T14:05:16Z
+[osuser@bastion ~]$ oc get sa -n dev-spark-operator
+NAME             SECRETS   AGE
+builder          1         85d
+default          1         85d
+deployer         1         85d
+spark            1         72d
+spark-operator   1         72d
+[osuser@bastion ~]$ oc get clusterrolebindings | grep spark
+spark-cluster-role-binding                                                  ClusterRole/spark-cluster-role                                                          72d
+spark-operator-clusterrolebinding                                           ClusterRole/spark-operator-clusterrole                                                  72d
+spark-role                                                                  ClusterRole/edit                                                                        2d5h
+spark-scc-binding                                                           ClusterRole/system:openshift:scc:spark-scc                                              72d
+system:openshift:scc:spark-operator-scc                                     ClusterRole/system:openshift:scc:spark-operator-scc                                     85d
+[osuser@bastion ~]$ helm list -n dev-spark-operator
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /home/osuser/.kube/config
+NAME            NAMESPACE               REVISION        UPDATED                                 STATUS          CHART                           APP VERSION
+spark-operator  dev-spark-operator      3               2025-09-13 15:20:39.16514231 +0000 UTC  deployed        spark-kubernetes-operator-1.2.0 0.4.0
+[osuser@bastion ~]$ helm list -n dev-spark
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /home/osuser/.kube/config
+NAME    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART                   APP VERSION
+ops     dev-spark       44              2025-09-20 07:39:42.090052556 +0000 UTC deployed        operationsservice-0.1.0 1.16.0
+[osuser@bastion ~]$ helm list -n dev-rns
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /home/osuser/.kube/config
+NAME    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART                   APP VERSION
+ops     dev-rns         246             2025-10-15 14:51:35.198186474 +0000 UTC deployed        operationsservice-0.1.0 1.16.0
+refund  dev-rns         80              2025-09-29 12:07:41.658342829 +0000 UTC deployed        refundservice-0.1.0     1.16.0
+[osuser@bastion ~]$ oc describe deploy spark-kubernetes-operator -n dev-spar-operator
+Error from server (NotFound): namespaces "dev-spar-operator" not found
+[osuser@bastion ~]$ oc describe deploy spark-kubernetes-operator -n dev-spark-operator
+Name:               spark-kubernetes-operator
+Namespace:          dev-spark-operator
+CreationTimestamp:  Wed, 06 Aug 2025 10:32:36 +0000
+Labels:             app.kubernetes.io/component=operator-deployment
+                    app.kubernetes.io/managed-by=Helm
+                    app.kubernetes.io/name=spark-kubernetes-operator
+                    app.kubernetes.io/version=0.4.0
+                    helm.sh/chart=spark-kubernetes-operator-1.2.0
+                    spark-role=operator
+Annotations:        deployment.kubernetes.io/revision: 6
+                    meta.helm.sh/release-name: spark-operator
+                    meta.helm.sh/release-namespace: dev-spark-operator
+Selector:           app.kubernetes.io/component=operator-deployment,app.kubernetes.io/name=spark-kubernetes-operator
+Replicas:           1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:       Recreate
+MinReadySeconds:    0
+Pod Template:
+  Labels:           app.kubernetes.io/component=operator-deployment
+                    app.kubernetes.io/name=spark-kubernetes-operator
+                    spark-role=operator
+  Annotations:      kubectl.kubernetes.io/default-container: spark-kubernetes-operator
+                    kubectl.kubernetes.io/restartedAt: 2025-09-22T10:49:47Z
+  Service Account:  spark-operator
+  Containers:
+   spark-kubernetes-operator:
+    Image:           registry.dev.sbiepay.sbi:8443/apache/spark-kubernetes-operator:0.4.0
+    Port:            19091/TCP
+    Host Port:       0/TCP
+    SeccompProfile:  RuntimeDefault
+    Command:
+      ./docker-entrypoint.sh
+      operator
+    Limits:
+      cpu:                1
+      ephemeral-storage:  2Gi
+      memory:             2Gi
+    Requests:
+      cpu:                1
+      ephemeral-storage:  2Gi
+      memory:             2Gi
+    Liveness:             http-get http://:probe-port/healthz delay=30s timeout=1s period=10s #success=1 #failure=3
+    Readiness:            http-get http://:probe-port/readyz delay=0s timeout=1s period=10s #success=1 #failure=30
+    Environment:
+      OPERATOR_NAMESPACE:   (v1:metadata.namespace)
+      HOST_IP:              (v1:status.hostIP)
+      POD_IP:               (v1:status.podIP)
+      POD_NAME:             (v1:metadata.name)
+      OPERATOR_NAME:       spark-kubernetes-operator
+      LOG_CONFIG:          -Dlog4j.configurationFile=/opt/spark-operator/conf/log4j2.properties
+      OPERATOR_JAVA_OPTS:  -Dfile.encoding=UTF8
+      SPARK_USER:          spark
+    Mounts:
+      /opt/spark-operator/conf from spark-operator-config-volume (rw)
+      /opt/spark-operator/logs from logs-volume (rw)
+  Volumes:
+   spark-operator-config-volume:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      spark-kubernetes-operator-configuration
+    Optional:  false
+   logs-volume:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:
+    SizeLimit:  <unset>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Progressing    True    NewReplicaSetAvailable
+  Available      True    MinimumReplicasAvailable
+OldReplicaSets:  spark-kubernetes-operator-76d954dcbd (0/0 replicas created), spark-kubernetes-operator-747ff49b59 (0/0 replicas created), spark-kubernetes-operator-6665cf96cf (0/0 replicas created), spark-kubernetes-operator-6d56d6b55f (0/0 replicas created), spark-kubernetes-operator-86b5f56f4c (0/0 replicas created)
+NewReplicaSet:   spark-kubernetes-operator-7d975469d9 (1/1 replicas created)
+Events:          <none>
+[osuser@bastion ~]$
