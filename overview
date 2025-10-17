@@ -1,0 +1,110 @@
+Environment Overview — Spark on OpenShift (DEV-RNS)
+🧱 Cluster & Platform
+
+You’re running on OpenShift 4.x (Red Hat) with Istio (Maistra 2.6.6).
+
+You access via a bastion host and use oc + helm for administration.
+
+Your cluster runs multiple application projects (namespaces), including:
+
+dev-rns → main app namespace (where Spark jobs run)
+
+dev-spark-operator → Spark Operator controller namespace
+
+dev-spark → legacy / supporting chart or service deployment
+
+dev-admin → admin-level services like admin-adminservice
+
+⚙️ Spark Deployment Architecture
+Component	Namespace	Description	Status
+Spark Operator (Helm-based)	dev-spark-operator	Helm release spark-operator, image registry.dev.sbiepay.sbi:8443/apache/spark-kubernetes-operator:0.4.0	✅ Running
+Watched Namespace(s)	dev-rns	Operator only reconciles jobs in dev-rns	✅ Confirmed via logs
+Spark History Server	dev-spark-operator	ClusterIP service spark-history-server:18080	✅ Active
+Spark CRDs	Cluster-wide	sparkapplications.spark.apache.org & sparkclusters.spark.apache.org	✅ Installed
+Driver/Executor Jobs	dev-rns	Created dynamically by Operator on SparkApplication submission	✅ Working
+Job Lifecycle	Ephemeral	Driver pods created → run → terminated after job completion	✅ Expected behavior
+🔒 Security, RBAC & SCC
+Resource	Namespace	Purpose	Status
+spark-operator	dev-spark-operator	Operator SA	✅
+spark-sa	dev-rns	Used by driver/executor pods	✅
+spark-scc-binding	ClusterRoleBinding	Binds SCC → SA	✅
+spark-scc	SCC	Custom security policy for Spark pods	✅
+spark-operator-clusterrolebinding	ClusterRoleBinding	Grants operator CRD control	✅
+SCC Privileges		Driver pods have necessary volumes + runAsAny	✅
+🧩 Applications Using Spark
+
+You have two major app deployments (Helm-managed):
+
+App	Namespace	Role	Interaction with Spark
+ops-operationsservice	dev-rns	Main backend service	Submits Spark jobs (Recon etc.)
+refund-refundservice	dev-rns	Companion service	Likely interacts with output / job triggers
+Recon Spark Jobs	dev-rns	via recon-spark-app.yaml	Processed by Operator, driver/executor pods auto-created
+
+These services interact with Spark via REST or internal Java clients, not manual spark-submit.
+
+🧠 Behavioral Notes
+
+When a developer or backend service (like ops-operationsservice) submits a Spark job, the SparkApplication CRD is created.
+
+The Spark Operator in dev-spark-operator reconciles it → launches driver/executor pods → updates CRD status.
+
+Once the job finishes → the driver & executors are terminated automatically.
+
+Logs are pushed to the Spark History Server.
+
+Prometheus-compatible metrics are exposed from the operator (/metrics endpoint on port 19091).
+
+📊 Current Observations
+
+✅ Operator stable for 70+ days
+✅ Health and readiness probes OK
+✅ Metrics service up
+✅ CRDs healthy
+⚠️ Kerberos warning — irrelevant since you’re using S3, Oracle JDBC
+✅ RBAC bindings valid
+✅ Spark jobs complete and clean up correctly
+✅ Istio sidecar injection active (2.6.6)
+✅ Helm charts managing everything cleanly
+
+🧩 Your Setup Type (Summary)
+
+You’re running Spark-on-Kubernetes Operator pattern, not standalone Spark.
+
+✔ No manual spark-submit
+
+✔ Jobs launched via CRD (SparkApplication)
+
+✔ Operator handles driver lifecycle
+
+✔ History server manages logs
+
+✔ SCC & RBAC customized for OpenShift security
+
+✔ Istio-compatible (mesh injected pods)
+
+✔ All managed via Helm
+
+🧰 What We Can Do Next
+
+If you confirm, I can now:
+
+🧾 Generate a diagnostic collector (single shell script) — will gather:
+
+SparkApplications (status, duration, exit reasons)
+
+Operator logs (last 500 lines)
+
+SCC + RoleBindings summary
+
+Active driver/executor pod details
+
+History Server service check
+→ Output as /tmp/spark_dev_rns_diagnostic.txt
+
+📊 Build a visual topology diagram showing:
+
+Operator → CRD → Driver Pod → Executor Pods
+
+Namespaces and network flow (with Istio mesh)
+
+⚡ Draft a production-readiness checklist for Spark Operator on OpenShift (security, scaling, monitoring).
