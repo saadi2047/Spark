@@ -1,0 +1,96 @@
+[osuser@bastion ~]$ oc get deploy -A | grep spark
+dev-spark-operator                                 spark-kubernetes-operator                       1/1     1            1           72d
+dev-spark                                          ops-operationsservice                           1/1     1            1           36d
+[osuser@bastion ~]$ oc get all -n dev-spark-operator
+Warning: apps.openshift.io/v1 DeploymentConfig is deprecated in v4.14+, unavailable in v4.10000+
+NAME                                             READY   STATUS    RESTARTS   AGE
+pod/spark-kubernetes-operator-7d975469d9-ppflp   1/1     Running   0          2d21h
+
+NAME                           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)     AGE
+service/spark-history-server   ClusterIP   172.30.185.170   <none>        18080/TCP   77d
+
+NAME                                        READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/spark-kubernetes-operator   1/1     1            1           72d
+
+NAME                                                   DESIRED   CURRENT   READY   AGE
+replicaset.apps/spark-kubernetes-operator-6665cf96cf   0         0         0       33d
+replicaset.apps/spark-kubernetes-operator-6d56d6b55f   0         0         0       33d
+replicaset.apps/spark-kubernetes-operator-747ff49b59   0         0         0       72d
+replicaset.apps/spark-kubernetes-operator-76d954dcbd   0         0         0       72d
+replicaset.apps/spark-kubernetes-operator-7d975469d9   1         1         1       25d
+replicaset.apps/spark-kubernetes-operator-86b5f56f4c   0         0         0       33d
+[osuser@bastion ~]$ oc describe deploy spark-kubernetes-operator-7d975469d9-ppflp -n dev-spark-operator
+Error from server (NotFound): deployments.apps "spark-kubernetes-operator-7d975469d9-ppflp" not found
+[osuser@bastion ~]$ oc describe deploy spark-kubernetes-operator -n dev-spark-operator
+Name:               spark-kubernetes-operator
+Namespace:          dev-spark-operator
+CreationTimestamp:  Wed, 06 Aug 2025 10:32:36 +0000
+Labels:             app.kubernetes.io/component=operator-deployment
+                    app.kubernetes.io/managed-by=Helm
+                    app.kubernetes.io/name=spark-kubernetes-operator
+                    app.kubernetes.io/version=0.4.0
+                    helm.sh/chart=spark-kubernetes-operator-1.2.0
+                    spark-role=operator
+Annotations:        deployment.kubernetes.io/revision: 6
+                    meta.helm.sh/release-name: spark-operator
+                    meta.helm.sh/release-namespace: dev-spark-operator
+Selector:           app.kubernetes.io/component=operator-deployment,app.kubernetes.io/name=spark-kubernetes-operator
+Replicas:           1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:       Recreate
+MinReadySeconds:    0
+Pod Template:
+  Labels:           app.kubernetes.io/component=operator-deployment
+                    app.kubernetes.io/name=spark-kubernetes-operator
+                    spark-role=operator
+  Annotations:      kubectl.kubernetes.io/default-container: spark-kubernetes-operator
+                    kubectl.kubernetes.io/restartedAt: 2025-09-22T10:49:47Z
+  Service Account:  spark-operator
+  Containers:
+   spark-kubernetes-operator:
+    Image:           registry.dev.sbiepay.sbi:8443/apache/spark-kubernetes-operator:0.4.0
+    Port:            19091/TCP
+    Host Port:       0/TCP
+    SeccompProfile:  RuntimeDefault
+    Command:
+      ./docker-entrypoint.sh
+      operator
+    Limits:
+      cpu:                1
+      ephemeral-storage:  2Gi
+      memory:             2Gi
+    Requests:
+      cpu:                1
+      ephemeral-storage:  2Gi
+      memory:             2Gi
+    Liveness:             http-get http://:probe-port/healthz delay=30s timeout=1s period=10s #success=1 #failure=3
+    Readiness:            http-get http://:probe-port/readyz delay=0s timeout=1s period=10s #success=1 #failure=30
+    Environment:
+      OPERATOR_NAMESPACE:   (v1:metadata.namespace)
+      HOST_IP:              (v1:status.hostIP)
+      POD_IP:               (v1:status.podIP)
+      POD_NAME:             (v1:metadata.name)
+      OPERATOR_NAME:       spark-kubernetes-operator
+      LOG_CONFIG:          -Dlog4j.configurationFile=/opt/spark-operator/conf/log4j2.properties
+      OPERATOR_JAVA_OPTS:  -Dfile.encoding=UTF8
+      SPARK_USER:          spark
+    Mounts:
+      /opt/spark-operator/conf from spark-operator-config-volume (rw)
+      /opt/spark-operator/logs from logs-volume (rw)
+  Volumes:
+   spark-operator-config-volume:
+    Type:      ConfigMap (a volume populated by a ConfigMap)
+    Name:      spark-kubernetes-operator-configuration
+    Optional:  false
+   logs-volume:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:
+    SizeLimit:  <unset>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Progressing    True    NewReplicaSetAvailable
+  Available      True    MinimumReplicasAvailable
+OldReplicaSets:  spark-kubernetes-operator-76d954dcbd (0/0 replicas created), spark-kubernetes-operator-747ff49b59 (0/0 replicas created), spark-kubernetes-operator-6665cf96cf (0/0 replicas created), spark-kubernetes-operator-6d56d6b55f (0/0 replicas created), spark-kubernetes-operator-86b5f56f4c (0/0 replicas created)
+NewReplicaSet:   spark-kubernetes-operator-7d975469d9 (1/1 replicas created)
+Events:          <none>
+[osuser@bastion ~]$
