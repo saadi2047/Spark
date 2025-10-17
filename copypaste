@@ -1,0 +1,28 @@
+
+Register this system with Red Hat Insights: insights-client --register
+Create an account or view all your systems at https://red.ht/insights-dashboard
+Last login: Fri Oct 17 10:21:50 2025 from 10.30.64.45
+[osuser@bastion ~]$ oc project
+Using project "dev-simulators" on server "https://api.dev.sbiepay.sbi:6443".
+[osuser@bastion ~]$ oc project dev-rns
+Now using project "dev-rns" on server "https://api.dev.sbiepay.sbi:6443".
+[osuser@bastion ~]$ oc get pods
+NAME                                    READY   STATUS    RESTARTS   AGE
+ops-operationsservice-66b45f4bb-rqz7n   2/2     Running   0          2d1h
+refund-refundservice-d979b6888-2jcg9    2/2     Running   0          7d20h
+[osuser@bastion ~]$ oc logs -f ops-operationsservice-66b45f4bb-rqz7n | grep SparkContext
+^X^C
+[osuser@bastion ~]$ oc get deploy -A | grep spark
+dev-spark-operator                                 spark-kubernetes-operator                       1/1     1            1           72d
+dev-spark                                          ops-operationsservice                           1/1     1            1           36d
+[osuser@bastion ~]$ oc logs -f ops-operationsservice-66b45f4bb-rqz7n | grep -i SparkContext
+^C
+[osuser@bastion ~]$
+
+
+
+
+
+
+
+
