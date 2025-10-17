@@ -13,3 +13,45 @@ oc adm policy who-can use scc spark-scc | grep spark-sa
 # 5. Validate network access from spark (when deployed)
 oc exec -it <spark-driver-pod> -n dev-rns -- curl -v http://ops-operationsservice.dev-rns.svc.cluster.local:9097/healthz
 oc exec -it <spark-driver-pod> -n dev-rns -- curl -v http://refund-refundservice.dev-rns.svc.cluster.local:9096/healthz
+
+
+
+
+
+
+Using username "osuser".
+Pre-authentication banner message from server:
+| This system is restricted to authorized users. Individuals attempting unautho
+> rized access will be prosecuted. If unauthorized, terminate access now! Click
+> ing on OK indicates your acceptance of the information in the background.
+|
+End of banner message from server
+This system is restricted to authorized users. Individuals attempting unauthorized access will be prosecuted. If unauthorized, terminate access now! Clicking on OK indicates your acceptance of the information in the background.
+
+Activate the web console with: systemctl enable --now cockpit.socket
+
+Register this system with Red Hat Insights: insights-client --register
+Create an account or view all your systems at https://red.ht/insights-dashboard
+Last login: Fri Oct 17 09:49:47 2025 from 10.30.64.45
+[osuser@bastion ~]$ oc project
+Using project "dev-simulators" on server "https://api.dev.sbiepay.sbi:6443".
+[osuser@bastion ~]$ oc project dev-rns
+Now using project "dev-rns" on server "https://api.dev.sbiepay.sbi:6443".
+[osuser@bastion ~]$ oc get pods -n dev-rns -o custom-columns=POD:.metadata.name,SERVICEACCOUNT:.spec.serviceAccountName,SCC:.metadata.annotations.openshift\\.io/scc
+POD                                     SERVICEACCOUNT   SCC
+ops-operationsservice-66b45f4bb-rqz7n   spark-sa         anyuid
+refund-refundservice-d979b6888-2jcg9    default          restricted-v2
+[osuser@bastion ~]$ oc get svc -n dev-rns | grep -E 'ops-|refund-'
+ops-operationsservice   ClusterIP   172.30.136.85   <none>        9097/TCP   80d
+refund-refundservice    ClusterIP   172.30.85.120   <none>        9096/TCP   78d
+[osuser@bastion ~]$ oc get pods -n dev-rns -L istio.io/rev,maistra-version
+NAME                                    READY   STATUS    RESTARTS   AGE     REV   MAISTRA-VERSION
+ops-operationsservice-66b45f4bb-rqz7n   2/2     Running   0          2d1h          2.6.6
+refund-refundservice-d979b6888-2jcg9    2/2     Running   0          7d19h         2.6.6
+[osuser@bastion ~]$ oc adm policy who-can use scc spark-scc | grep spark-sa
+[osuser@bastion ~]$ oc get po
+NAME                                    READY   STATUS    RESTARTS   AGE
+ops-operationsservice-66b45f4bb-rqz7n   2/2     Running   0          2d1h
+refund-refundservice-d979b6888-2jcg9    2/2     Running   0          7d19h
+[osuser@bastion ~]$
+
