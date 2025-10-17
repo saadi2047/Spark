@@ -21,6 +21,36 @@ dev-spark                                          ops-operationsservice        
 
 
 
+[osuser@bastion ~]$ oc project dev-rns
+Now using project "dev-rns" on server "https://api.dev.sbiepay.sbi:6443".
+[osuser@bastion ~]$ oc get deploy -A | grep spark
+dev-spark-operator                                 spark-kubernetes-operator                       1/1     1            1           72d
+dev-spark                                          ops-operationsservice                           1/1     1            1           36d
+[osuser@bastion ~]$ oc get all -n dev-spark-operator
+Warning: apps.openshift.io/v1 DeploymentConfig is deprecated in v4.14+, unavailable in v4.10000+
+NAME                                             READY   STATUS    RESTARTS   AGE
+pod/spark-kubernetes-operator-7d975469d9-ppflp   1/1     Running   0          2d21h
+
+NAME                           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)     AGE
+service/spark-history-server   ClusterIP   172.30.185.170   <none>        18080/TCP   77d
+
+NAME                                        READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/spark-kubernetes-operator   1/1     1            1           72d
+
+NAME                                                   DESIRED   CURRENT   READY   AGE
+replicaset.apps/spark-kubernetes-operator-6665cf96cf   0         0         0       33d
+replicaset.apps/spark-kubernetes-operator-6d56d6b55f   0         0         0       33d
+replicaset.apps/spark-kubernetes-operator-747ff49b59   0         0         0       72d
+replicaset.apps/spark-kubernetes-operator-76d954dcbd   0         0         0       72d
+replicaset.apps/spark-kubernetes-operator-7d975469d9   1         1         1       25d
+replicaset.apps/spark-kubernetes-operator-86b5f56f4c   0         0         0       33d
+[osuser@bastion ~]$
+
+
+
+
+
+
 
 
 
