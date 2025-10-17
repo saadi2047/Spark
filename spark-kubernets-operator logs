@@ -1,0 +1,36 @@
+[1]+  Stopped                 oc logs -f deploy/spark-kubernetes-operator -n dev-spark-operator
+[osuser@bastion ~]$ ^C
+[osuser@bastion ~]$ oc logs -f deploy/spark-kubernetes-operator -n dev-spark-operator | grep -i INFO
+25/10/14 13:30:47 INFO SparkOperator: Configuring operator with 50 reconciliation threads.
+25/10/14 13:30:47 INFO SparkOperator: Adding Operator JosdkMetrics to metrics system.
+25/10/14 13:30:47 INFO SparkOperator: Configuring operator with 50 reconciliation threads.
+25/10/14 13:30:47 INFO SparkOperator: Adding Operator JosdkMetrics to metrics system.
+25/10/14 13:30:47 INFO Default ConfigurationService implementation: Created configuration for reconciler org.apache.spark.k8s.operator.reconciler.SparkAppReconciler with name sparkappreconciler
+25/10/14 13:30:47 INFO SparkOperator: Initializing with watched namespaces [dev-rns]
+25/10/14 13:30:47 INFO SparkOperatorConf: Reconciler retry policy is configured with unlimited max attempts
+25/10/14 13:30:47 INFO Operator: Registered reconciler: 'sparkappreconciler' for resource: 'class org.apache.spark.k8s.operator.SparkApplication' for namespace(s): [dev-rns]
+25/10/14 13:30:47 INFO Default ConfigurationService implementation: Created configuration for reconciler org.apache.spark.k8s.operator.reconciler.SparkClusterReconciler with name sparkclusterreconciler
+25/10/14 13:30:47 INFO SparkOperator: Initializing with watched namespaces [dev-rns]
+25/10/14 13:30:47 INFO SparkOperatorConf: Reconciler retry policy is configured with unlimited max attempts
+25/10/14 13:30:47 INFO Operator: Registered reconciler: 'sparkclusterreconciler' for resource: 'class org.apache.spark.k8s.operator.SparkCluster' for namespace(s): [dev-rns]
+25/10/14 13:30:47 INFO Operator: Operator SDK 5.1.1 (commit: e3e9458) built on 2025-05-26T07:26:01.000+0000 starting...
+25/10/14 13:30:47 INFO Operator: Client version: 7.3.1
+25/10/14 13:30:47 INFO Controller: Starting 'sparkappreconciler' controller for reconciler: org.apache.spark.k8s.operator.reconciler.SparkAppReconciler, resource: org.apache.spark.k8s.operator.SparkApplication
+25/10/14 13:30:47 INFO Controller: Starting 'sparkclusterreconciler' controller for reconciler: org.apache.spark.k8s.operator.reconciler.SparkClusterReconciler, resource: org.apache.spark.k8s.operator.SparkCluster
+25/10/14 13:30:50 INFO Controller: 'sparkclusterreconciler' controller started
+25/10/14 13:30:51 INFO Controller: 'sparkappreconciler' controller started
+25/10/14 13:30:51 INFO ProbeService: Probe service started
+25/10/14 13:30:54 INFO MetricsSystem: sinkPropertiesMap: {}
+25/10/14 13:30:54 INFO PrometheusPullModelHandler: PrometheusPullModelHandler started
+25/10/14 13:30:54 INFO MetricsService: Starting Metrics Service for Prometheus ...
+25/10/14 13:30:58 INFO EventProcessor: Resource Kubernetes Resource Creator/Update Conflict during reconciliation. Message: Failure executing: PUT at: https://172.30.0.1:443/apis/spark.apache.org/v1beta1/namespaces/dev-rns/sparkapplications/recon-ekqgjko4pc/status. Message: Operation cannot be fulfilled on sparkapplications.spark.apache.org "recon-ekqgjko4pc": the object has been modified; please apply your changes to the latest version and try again. Received status: Status(apiVersion=v1, code=409, details=StatusDetails(causes=[], group=spark.apache.org, kind=sparkapplications, name=recon-ekqgjko4pc, retryAfterSeconds=null, uid=null, additionalProperties={}), kind=Status, message=Operation cannot be fulfilled on sparkapplications.spark.apache.org "recon-ekqgjko4pc": the object has been modified; please apply your changes to the latest version and try again, metadata=ListMeta(_continue=null, remainingItemCount=null, resourceVersion=null, selfLink=null, additionalProperties={}), reason=Conflict, status=Failure, additionalProperties={}). Resource name: null
+25/10/14 13:32:01 INFO KerberosConfDriverFeatureStep: You have not specified a krb5.conf file locally or via a ConfigMap. Make sure that you have the krb5.conf locally on the driver image.
+        at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:588)
+25/10/14 13:39:55 INFO KerberosConfDriverFeatureStep: You have not specified a krb5.conf file locally or via a ConfigMap. Make sure that you have the krb5.conf locally on the driver image.
+        at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:588)
+25/10/14 14:00:00 INFO KerberosConfDriverFeatureStep: You have not specified a krb5.conf file locally or via a ConfigMap. Make sure that you have the krb5.conf locally on the driver image.
+        at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:588)
+25/10/14 14:30:00 INFO KerberosConfDriverFeatureStep: You have not specified a krb5.conf file locally or via a ConfigMap. Make sure that you have the krb5.conf locally on the driver image.
+        at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:588)
+25/10/14 15:00:00 INFO KerberosConfDriverFeatureStep: You have not specified a krb5.conf file locally or via a ConfigMap. Make sure that you have the krb5.conf locally on the driver image.
+        at org.apache.hadoop.security.UserGroupInformation.getCurrentUser(UserGroupInformation.java:588)
