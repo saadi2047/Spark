@@ -1,0 +1,15 @@
+# 1. Confirm both pods and their SCCs
+oc get pods -n dev-rns -o custom-columns=POD:.metadata.name,SERVICEACCOUNT:.spec.serviceAccountName,SCC:.metadata.annotations.openshift\\.io/scc
+
+# 2. Verify service endpoints
+oc get svc -n dev-rns | grep -E 'ops-|refund-'
+
+# 3. Confirm Istio mesh revision labels
+oc get pods -n dev-rns -L istio.io/rev,maistra-version
+
+# 4. Check if spark-sa is bound to spark-scc
+oc adm policy who-can use scc spark-scc | grep spark-sa
+
+# 5. Validate network access from spark (when deployed)
+oc exec -it <spark-driver-pod> -n dev-rns -- curl -v http://ops-operationsservice.dev-rns.svc.cluster.local:9097/healthz
+oc exec -it <spark-driver-pod> -n dev-rns -- curl -v http://refund-refundservice.dev-rns.svc.cluster.local:9096/healthz
