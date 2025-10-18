@@ -1,0 +1,9 @@
+oc get sparkapplications -n dev-rns -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.metadata.finalizers}{"\n"}{end}' | grep -v '\[\]'
+
+for app in $(oc get sparkapplications -n dev-rns --no-headers | awk '{print $1}'); do
+  echo "Deleting SparkApplication: $app"
+  oc patch sparkapplication "$app" -n dev-rns --type=merge -p '{"metadata":{"finalizers":[]}}' 2>/dev/null
+  oc delete sparkapplication "$app" -n dev-rns --wait=false --ignore-not-found
+done
+
+watch -n 5 "oc get sparkapplications -n dev-rns | wc -l"
